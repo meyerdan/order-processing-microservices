@@ -1,6 +1,6 @@
 organization := "org.camunda"
 
-name := "Camunda-Akka-Worker-payment"
+name := "camunda-worker-akka-payment"
 
 version := "1.0.0-SNAPSHOT"
 
