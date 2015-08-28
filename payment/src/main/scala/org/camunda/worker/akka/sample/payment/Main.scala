@@ -16,6 +16,13 @@ import scala.io.StdIn._
  */
 object Main extends App {
  
+  // extract the host from arguments
+  val host = if(args.size == 0) {
+    "http://localhost:8080/engine-rest"
+  } else { 
+    args(0)
+  }
+  
   println("")
   println("starting...........")
   println("press ENTER to exit")
@@ -29,7 +36,7 @@ object Main extends App {
   val worker = system.actorOf(UnreliableWorker.props(delay = 200, reliability = 0.75), name = "worker-1")
   
   // start polling
-  val pollActor = system.actorOf(PollActor.props(hostAddress = "http://localhost:8080/engine-rest", maxTasks = 5, waitTime= 100, lockTime = 600), name = "poller")
+  val pollActor = system.actorOf(PollActor.props(hostAddress = host, maxTasks = 5, waitTime= 100, lockTime = 600), name = "poller")
   pollActor ! Poll(topicName = "payment", worker)
   
   // waiting for end
