@@ -19,10 +19,7 @@ import org.camunda.bpm.ext.sdk.CamundaClient;
 import org.camunda.bpm.ext.sdk.TaskContext;
 import org.camunda.bpm.ext.sdk.Worker;
 import org.camunda.bpm.ext.sdk.WorkerRegistration;
-import org.camunda.spin.SpinList;
 import org.camunda.spin.json.SpinJsonNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -34,9 +31,7 @@ import static org.camunda.spin.plugin.variable.SpinValues.*;
  *
  */
 @Component
-public class ReserveOrderItemsService {
-
-  private static final Logger LOG = LoggerFactory.getLogger(ReserveOrderItemsService.class);
+public class AdjustInventoryDataService {
 
   @Autowired
   protected CamundaClient camundaClient;
@@ -47,28 +42,17 @@ public class ReserveOrderItemsService {
   protected void registerWorker() {
     registration = camundaClient.registerWorker()
       .lockTime(120)
-      .topicName("reserveOrderItems")
+      .topicName("adjustInventory")
       .variableNames("order")
       .worker(new Worker() {
         public void doWork(TaskContext taskContext) {
 
           SpinJsonNode orderData = taskContext.getVariable("order");
-          if(orderData == null) {
-            taskContext.taskFailed("Variable 'order' does not exist.");
-          }
-          else {
 
-            // set new order status
-            orderData.prop("status", "RESERVED");
+          // set new order status
+          orderData.prop("status", "INVENTORY");
 
-            // mark items as reserved
-            SpinList<SpinJsonNode> orderItems = orderData.prop("orderItems").elements();
-            for (SpinJsonNode orderItem : orderItems) {
-              orderItem.prop("reserved", true);
-            }
-
-            taskContext.complete(createVariables().putValue("order", jsonValue(orderData)));
-          }
+          taskContext.complete(createVariables().putValue("order", jsonValue(orderData)));
 
         }
       }).build();
