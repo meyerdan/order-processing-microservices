@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import static org.camunda.bpm.engine.variable.Variables.*;
 
 /**
  * @author Daniel Meyer
@@ -46,15 +47,24 @@ public class ReserveOrderItemsService {
     registration = camundaClient.registerWorker()
       .lockTime(120)
       .topicName("reserveOrderItems")
+      .variableNames("order")
       .worker(new Worker() {
         public void doWork(TaskContext taskContext) {
-          JsonValue orderValue = taskContext.getVariableTyped("reserveOrderItems");
 
-          SpinList<SpinJsonNode> orderItems = orderValue.getValue()
-            .prop("orderItems").elements();
+          JsonValue orderValue = taskContext.getVariable("order");
+          if(orderValue == null) {
+            taskContext.taskFailed("Variable 'order' does not exist.");
+          }
+          else {
+            SpinJsonNode orderData = orderValue.getValue();
 
-          for (SpinJsonNode orderItem : orderItems) {
+            SpinList<SpinJsonNode> orderItems = orderData.prop("orderItems").elements();
 
+            for (SpinJsonNode orderItem : orderItems) {
+              orderItem.prop("reserved", true);
+            }
+
+            taskContext.complete(createVariables().putValue("order", orderValue));
           }
 
         }
