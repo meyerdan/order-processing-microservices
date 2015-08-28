@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class CamundaClientProducer {
 
-  @Value("${camunda.endpointUrl:http://localhost:8080/engine-rest}")
+  @Value("${camunda.endpointUrl:http://192.168.88.216:8080/engine-rest}")
   protected String endpointUrl;
 
   protected CamundaClient client;
