@@ -1,8 +1,0 @@
-{
-  "variables": {
-    "order": {
-      "value": "{ \"orderId\": \"312312\", \"orderStatus\": \"NEW\", \"orderItems\": [] }",
-      "type": "json"
-    }
-  }
-}

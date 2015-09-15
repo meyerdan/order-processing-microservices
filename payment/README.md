@@ -18,4 +18,6 @@ Build application with
 sbt assemply
 ```
 
+The host of the camunda server can be set with first command line argument (default is localhost).
+
 The running application can shut down by press ENTER.
