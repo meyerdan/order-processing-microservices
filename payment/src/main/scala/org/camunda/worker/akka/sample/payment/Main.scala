@@ -4,12 +4,10 @@ package org.camunda.worker.akka/**
  * @author Philipp Ossler
  */
 
-import scala.collection.JavaConversions._
-import org.camunda.worker.akka.PollActor.Poll
-import org.camunda.worker.dto.LockedTaskDto
 import akka.actor._
-import org.camunda.worker.akka.worker._
 import scala.io.StdIn._
+import org.camunda.worker.akka.PollActor.Poll
+import org.camunda.worker.akka.sample.payment.PaymentWorker
 
 /**
  * @author Philipp Ossler
@@ -33,7 +31,7 @@ object Main extends App {
   val system = ActorSystem("MyActorSystem")
   
   // create worker
-  val worker = system.actorOf(UnreliableWorker.props(delay = 200, reliability = 0.75), name = "worker-1")
+  val worker = system.actorOf(PaymentWorker.props(), name = "payment-worker")
   
   // start polling
   val pollActor = system.actorOf(PollActor.props(hostAddress = host, maxTasks = 5, waitTime= 100, lockTime = 600), name = "poller")
@@ -47,4 +45,6 @@ object Main extends App {
   println("")
   
   system.shutdown
+  // hard end - any thread till hanging
+  System.exit(0)
 }
