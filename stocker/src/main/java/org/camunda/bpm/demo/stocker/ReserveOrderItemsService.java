@@ -47,7 +47,7 @@ public class ReserveOrderItemsService {
   protected void registerWorker() {
     registration = camundaClient.registerWorker()
       .lockTime(120)
-      .topicName("reserveOrderItems")
+      .topicName("orderProcess:reserveOrderItems")
       .variableNames("order")
       .worker(new Worker() {
         public void doWork(TaskContext taskContext) {

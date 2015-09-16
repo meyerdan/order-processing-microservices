@@ -42,7 +42,7 @@ public class AdjustInventoryDataService {
   protected void registerWorker() {
     registration = camundaClient.registerWorker()
       .lockTime(120)
-      .topicName("adjustInventory")
+      .topicName("orderProcess:adjustInventory")
       .variableNames("order")
       .worker(new Worker() {
         public void doWork(TaskContext taskContext) {
