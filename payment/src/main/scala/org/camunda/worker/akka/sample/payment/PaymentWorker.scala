@@ -4,10 +4,7 @@ import org.camunda.worker.akka.client.LockedTask
 import org.camunda.worker.akka.PollActor._
 import akka.routing._
 import akka.actor.Props
-import scala.concurrent._
-import ExecutionContext.Implicits.global
 import org.camunda.worker.akka.client.VariableValue
-import org.camunda.worker.akka.client.VariableValue.anyToVariableValue
 import org.camunda.worker.akka.Worker
 import scala.concurrent.duration._
 import scala.util.Random
@@ -17,14 +14,19 @@ import scala.util.Random
  */
 class PaymentWorker(delay: Duration) extends Worker {
 
-  def work(task: LockedTask): Future[Map[String, VariableValue]] = Future {
+  def work(task: LockedTask): Map[String, VariableValue] = {
     
-    val payment = calculatePayment
+    val orderId = task.variables.get("orderId") match {
+      case Some(variableValue)  => variableValue.asValue[String]
+      case None                 => "" // throw IllegalArgumentException("no order id available")
+    }
     
-    Map("payment" -> payment)
+    val payment = calculatePayment(orderId)
+    
+    Map(s"payment-$orderId" -> payment)
   }
 
-  private def calculatePayment = {
+  private def calculatePayment(orderId: String) = {
     // simulate calculation
     java.lang.Thread.sleep(delay.toMillis)
     // return result
@@ -35,7 +37,7 @@ class PaymentWorker(delay: Duration) extends Worker {
 
 object PaymentWorker {
 
-  def props(delay: Duration = 250 millis): Props =
+  def props(delay: Duration = 100 millis): Props =
     Props(new PaymentWorker(delay))
 
 }

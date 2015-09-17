@@ -34,8 +34,8 @@ object Main extends App {
   val worker = system.actorOf(PaymentWorker.props(), name = "payment-worker")
   
   // start polling
-  val pollActor = system.actorOf(PollActor.props(hostAddress = host, maxTasks = 5, waitTime= 100, lockTime = 600), name = "poller")
-  pollActor ! Poll(topicName = "orderProcess:payment", worker)
+  val pollActor = system.actorOf(PollActor.props(hostAddress = host, maxTasks = 5, waitTime= 100, lockTime = 600))
+  pollActor ! Poll(topicName = "orderProcess:payment", worker, variableNames = List("orderId"))
   
   // waiting for end
   val input = readLine()
