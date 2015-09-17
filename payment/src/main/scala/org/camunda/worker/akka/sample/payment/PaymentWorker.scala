@@ -8,17 +8,23 @@ import org.camunda.worker.akka.client.VariableValue
 import org.camunda.worker.akka.Worker
 import scala.concurrent.duration._
 import scala.util.Random
+import net.liftweb.json.JsonAST.JValue
+import net.liftweb.json._
+import net.liftweb.json.JsonDSL._
 
 /**
  * sample worker
  */
 class PaymentWorker(delay: Duration) extends Worker {
 
+  // default formats for json
+  implicit val formats = DefaultFormats
+  
   def work(task: LockedTask): Map[String, VariableValue] = {
     
-    val orderId = task.variables.get("orderId") match {
-      case Some(variableValue)  => variableValue.asValue[String]
-      case None                 => "" // throw IllegalArgumentException("no order id available")
+    val orderId: String = task.variable[JValue]("order") match {
+      case Some(json) => (json \ "orderId").extract[String]
+      case None       => "" // throw new IllegalArgumentException("order is not available")
     }
     
     val payment = calculatePayment(orderId)
